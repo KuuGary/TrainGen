@@ -44,7 +44,7 @@ Example:
 ```
 
 ## Scenario 2: Requirement-to-Design Generation
- - The same repo_summary.txt is used to provide architectural context to the model.
+ - The same `repo_summary.txt` is used to provide architectural context to the model.
  - Currently, 5 requirements are manually written to cover typical backend development tasks such as:
    - Numerical computation API
    - Health check endpoint
@@ -166,7 +166,7 @@ pip install -r requirements.txt
 ```
 python main.py --task qa
 ```
-### Generate requirement-to-design training data (Scenario 1)
+### Generate requirement-to-design training data (Scenario 2)
 ```
 python main.py --task re
 ```
