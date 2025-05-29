@@ -13,6 +13,12 @@ This document outlines the data structure and generation strategy for two key tr
 
 Both scenarios are designed to support fine-tuning or evaluating language models with instruction-following capabilities based on real-world codebases. Sample outputs are provided in the `/sample_results/` folder.
 
+💡 **Note:**  
+All experiments and generated samples are currently based on the `/example/` folder,  
+which contains code extracted from a real GitHub Python Flask project: [minimal-flask](https://github.com/matdoering/minimal-flask-example/tree/master).  
+You can replace this folder with any other GitHub project codebase,  
+
+
 ## Scenario 1: Code-based Q&A Generation
  - Each function in `functions.json` and `repo_summary.txt` is used as input to the QA generation module (llm_generate_qa.py).
  - The model is prompted to answer the question: currently fixed to “函数 X 是做什么的？”
