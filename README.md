@@ -32,6 +32,17 @@ Each sample is stored as a JSON object in a `.jsonl` file. The structure is as f
 }
 ```
 
+Example:
+```
+{
+"file": "example/test/conftest.py",
+"code": "def pytest_addoption(parser):\n    # ability to test API on different hosts\n    parser.addoption(\"--host\", action=\"store\", default=\"http://localhost:5000\")", "function_name": "pytest_addoption",
+"question": "函数 pytest_addoption 是做什么的？",
+"answer": "该函数的作用是为测试API提供支持，允许在不同的 hosts上运行测试。它通过parser对象添加选项，并将选项的值传入到调用函数中。",
+"trace": "首先，函数从参数分析开始，它接收了一个参数 'parser'。然后，函数检查参数的类型，并将参数传递给 parser.addoption 方法。接下来，函数检查参数的类型，并将参数的值传递给 addoption 方法。最后，函数调用 addoption 方法，并将参数的值传入到方法中。"
+}
+```
+
 ## Scenario 2: Requirement-to-Design Generation
  - The same repo_summary.txt is used to provide architectural context to the model.
  - Currently, 5 requirements are manually written to cover typical backend development tasks such as:
@@ -52,7 +63,16 @@ Each sample is stored as a JSON object in a `.jsonl` file. The structure is as f
   "trace": A multi-step reasoning process,
 }
 ```
-## 📎 Metadata Summary
+Example:
+```
+{
+"requirement": "添加一个新的 API 接口，用于计算用户提交的两个数的平均值。",
+"design": "在后端服务中新增一个 GET 类型的接口，例如 `/average`。该接口接收一个包含两个整数的 JSON 请求体，计算并返回这两个数的平均值。在接口请求处理中，需要将请求中的两个整数分别提取出来并进行计算。最终结果以 JSON 格式返回。",
+"trace": "该功能属于典型的数值计算类业务逻辑，适合通过 Flask 的 GET 接口处理。考虑到项目已使用 Flask，可通过 `@app.route('/average', methods=['GET'])` 或蓝图方式注册路由。请求体格式应为 JSON，因此需要通过 `request.get_json()` 获取数据。计算平均值可直接使用 `(int1 + int2) / 2`，结果以 JSON 格式返回。无需引入额外依赖，设计上应尽量复用已有输入输出处理流程，确保一致性和可维护性。"
+}
+```
+
+## Metadata Summary
 
 Both scenarios embed contextual metadata to generate its training dataset, summarize as followings:
 
@@ -65,14 +85,25 @@ Both scenarios embed contextual metadata to generate its training dataset, summa
 | `requirement`  | ❌                          | ✅ Business requirement             |
 | `repo_summary` | ✅ Used during generation   | ✅ Used during generation           |
 
+## Design Rationale
 
-We adopt a practical and evolving approach to dataset diversity:
+1. Grounded in Real Code Contexts
+The data is generated directly from local repositories (via `extractor.py`). This ensures that: All questions and answers are grounded in actual business logic.
+
+3. End-to-End Instruction Format
+Each sample follows an instruction → reasoning → result pattern (e.g., requirement → design + trace), which aligns well with the structure expected LLMs.
+
+3. JSONL for Modularity & Automation
+Using .jsonl format enables: Easy processing and compatibility with popular fine-tuning frameworks
+
+
+### I adopt a practical and evolving approach to dataset diversity:
 
 ## ✅ Current Measures
 
  - Scenario 1 traverses functions across all directories to collect varied technical roles.
  - Scenario 2 includes a diverse category mix of requirements.
- - Reasoning traces are encouraged to promote explainability, not just answers.
+ - Reasoning traces are encouraged to promote explainability, not just ansIrs.
 
 ## 🚧 Known Limitations
 
@@ -124,7 +155,7 @@ Each module plays a distinct role in the pipeline:
 ## Installation
 Clone the repository and install dependencies:
 ```
-git clone 
+git clone https://github.com/KuuGary/TrainGen.git
 cd TrainGen
 pip install -r requirements.txt
 ```
@@ -140,4 +171,29 @@ python main.py --task qa
 python main.py --task re
 ```
 
+## Evaluation Strategy (Planned)
+I plan to evaluate the data quality via small-scale fine-tuning. A test pipeline has been initialized:
+```
+/test/
+├── finetune.py              
+├── inference.py          
+```
+However, due to the current lack of a GPU environment and limited compute resources, model fine-tuning and downstream evaluation are not yet completed.
+
+# Other Notes
+
+- A rule-based pipeline (utils/generate_qa.py) allows deterministic generation based on curated heuristics, such as function names and docstring/keyword matches.
+- A few-shot LLM-based generation pipeline leverages prompt engineering to produce stable, high-quality samples one at a time, reducing hallucination and ensuring structural consistency.
+- The code is modular, lightweight, and requires minimal setup, making it easy to integrate into internal tooling or adapt for other domains.
+
+# 🔄 Future Work & Extensions
+
+This framework is designed to be extensible. Possible directions include:
+
+- Bilingual Support: extendable to support both Chinese and English, or other languages, by modifying prompt templates and LLMs.
+- Model Upgrade: While current generation uses DeepSeek-Distill 1.3B or similar models, switching to larger models will likely improve answer fluency, trace reasoning, and design richness.
+- Question Diversification: Currently, scenario 1 focuses only on “What does this function do?”. This can be expanded to include, for example: What is the purpose of this parameter? How does this function relate to others in the same module? and so on.
+- Currently, all functions are included. Future iterations can: Rank by function complexity or docstring availability. Sample functions representative of different modules or roles.
+- Evaluation Pipeline
+- Support for More Project Types
 
