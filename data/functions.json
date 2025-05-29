@@ -1,0 +1,80 @@
+[
+  {
+    "file": "example/test/conftest.py",
+    "function": "pytest_addoption",
+    "docstring": null,
+    "code": "def pytest_addoption(parser):\n    # ability to test API on different hosts\n    parser.addoption(\"--host\", action=\"store\", default=\"http://localhost:5000\")"
+  },
+  {
+    "file": "example/test/conftest.py",
+    "function": "host",
+    "docstring": null,
+    "code": "def host(request):\n    return request.config.getoption(\"--host\")"
+  },
+  {
+    "file": "example/test/conftest.py",
+    "function": "api_v1_host",
+    "docstring": null,
+    "code": "def api_v1_host(host):\n    return os.path.join(host, \"api\", \"v1\")"
+  },
+  {
+    "file": "example/test/test_endpoints.py",
+    "function": "test_blueprint_x_test",
+    "docstring": null,
+    "code": "def test_blueprint_x_test(api_v1_host):\n    endpoint = os.path.join(api_v1_host, 'path_for_blueprint_x', 'test')\n    response = requests.get(endpoint)\n    assert response.status_code == 200\n    json = response.json()\n    assert 'msg' in json\n    assert json['msg'] == \"I'm the test endpoint from blueprint_x.\""
+  },
+  {
+    "file": "example/test/test_endpoints.py",
+    "function": "test_blueprint_y_test",
+    "docstring": null,
+    "code": "def test_blueprint_y_test(api_v1_host):\n    endpoint = os.path.join(api_v1_host, 'path_for_blueprint_y', 'test')\n    response = requests.get(endpoint)\n    assert response.status_code == 200\n    json = response.json()\n    assert 'msg' in json\n    assert json['msg'] == \"I'm the test endpoint from blueprint_y.\""
+  },
+  {
+    "file": "example/test/test_endpoints.py",
+    "function": "test_blueprint_x_plus",
+    "docstring": null,
+    "code": "def test_blueprint_x_plus(api_v1_host):\n    endpoint = os.path.join(api_v1_host, 'path_for_blueprint_x', 'plus')\n    payload = {'number': 5}\n    response = requests.post(endpoint, json=payload)\n    assert response.status_code == 200\n    json = response.json()\n    assert 'msg' in json\n    assert json['msg'] == \"Your result is: '10'\""
+  },
+  {
+    "file": "example/test/test_endpoints.py",
+    "function": "test_blueprint_x_minus",
+    "docstring": null,
+    "code": "def test_blueprint_x_minus(api_v1_host):\n    endpoint = os.path.join(api_v1_host, 'path_for_blueprint_y', 'minus')\n    payload = {'number': 1000}\n    response = requests.post(endpoint, json=payload)\n    assert response.status_code == 200\n    json = response.json()\n    assert 'msg' in json\n    assert json['msg'] == \"Your result is: '0'\""
+  },
+  {
+    "file": "example/test/test_endpoints.py",
+    "function": "test_swagger_specification",
+    "docstring": null,
+    "code": "def test_swagger_specification(host):\n    endpoint = os.path.join(host, 'api', 'swagger.json')\n    validate_spec_url(endpoint)"
+  },
+  {
+    "file": "example/src/app.py",
+    "function": "create_swagger_spec",
+    "docstring": "Swagger API definition.",
+    "code": "def create_swagger_spec():\n    \"\"\"\n    Swagger API definition.\n    \"\"\"\n    return jsonify(spec.to_dict())"
+  },
+  {
+    "file": "example/src/endpoints/blueprint_y.py",
+    "function": "test",
+    "docstring": "---\nget:\n  description: test endpoint\n  responses:\n    '200':\n      description: call successful\n      content:\n        application/json:\n          schema: OutputSchema\n  tags:\n      - testing",
+    "code": "def test():\n    \"\"\"\n    ---\n    get:\n      description: test endpoint\n      responses:\n        '200':\n          description: call successful\n          content:\n            application/json:\n              schema: OutputSchema\n      tags:\n          - testing\n    \"\"\"\n    output = {\"msg\": \"I'm the test endpoint from blueprint_y.\"}\n    return jsonify(output)"
+  },
+  {
+    "file": "example/src/endpoints/blueprint_y.py",
+    "function": "minus_y",
+    "docstring": "---\npost:\n  description: increments the input by x\n  requestBody:\n    required: true\n    content:\n        application/json:\n            schema: InputSchema\n  responses:\n    '200':\n      description: call successful\n      content:\n        application/json:\n          schema: OutputSchema\n  tags:\n      - calculation",
+    "code": "def minus_y():\n    \"\"\"\n    ---\n    post:\n      description: increments the input by x\n      requestBody:\n        required: true\n        content:\n            application/json:\n                schema: InputSchema\n      responses:\n        '200':\n          description: call successful\n          content:\n            application/json:\n              schema: OutputSchema\n      tags:\n          - calculation\n    \"\"\"\n    # retrieve body data from input JSON\n    data = request.get_json()\n    in_val = data['number']\n    # comput result and output as JSON\n    result = in_val - y\n    output = {\"msg\": f\"Your result is: '{result}'\"}\n    return jsonify(output)"
+  },
+  {
+    "file": "example/src/endpoints/blueprint_x.py",
+    "function": "test",
+    "docstring": "---\nget:\n  description: test endpoint\n  responses:\n    '200':\n      description: call successful\n      content:\n        application/json:\n          schema: OutputSchema\n  tags:\n      - testing",
+    "code": "def test():\n    \"\"\"\n    ---\n    get:\n      description: test endpoint\n      responses:\n        '200':\n          description: call successful\n          content:\n            application/json:\n              schema: OutputSchema\n      tags:\n          - testing\n    \"\"\"\n    output = {\"msg\": \"I'm the test endpoint from blueprint_x.\"}\n    return jsonify(output)"
+  },
+  {
+    "file": "example/src/endpoints/blueprint_x.py",
+    "function": "plus_x",
+    "docstring": "---\npost:\n  description: increments the input by x\n  requestBody:\n    required: true\n    content:\n        application/json:\n            schema: InputSchema\n  responses:\n    '200':\n      description: call successful\n      content:\n        application/json:\n          schema: OutputSchema\n  tags:\n      - calculation",
+    "code": "def plus_x():\n    \"\"\"\n    ---\n    post:\n      description: increments the input by x\n      requestBody:\n        required: true\n        content:\n            application/json:\n                schema: InputSchema\n      responses:\n        '200':\n          description: call successful\n          content:\n            application/json:\n              schema: OutputSchema\n      tags:\n          - calculation\n    \"\"\"\n    # retrieve body data from input JSON\n    data = request.get_json()\n    in_val = data['number']\n    # compute result and return as JSON\n    result = in_val + x\n    output = {\"msg\": f\"Your result is: '{result}'\"}\n    return jsonify(output)"
+  }
+]
